@@ -23,6 +23,13 @@ void test_numbers() {
     assert(real_number > 4.8212 && real_number < 4.8214, "Should be able to parse a number");
 }
 
+void test_objects() {
+    GeneSON* test_string = parse_json("{\"a\":\"b\"}");
+    GeneSON* test_string2 = parse_json("{\"a\":[1, 2, 3]}");
+    GeneSON* test_string3 = parse_json("{\"a\":\"b\", \"c\": \"d\"}");
+    GeneSON* test_string4 = parse_json("{\"a\":{\"b\":\"c\"}}");
+}
+
 void test_bools() {
     GeneSON* test_string = parse_json("true");
     bool real_bool = geneson_get_bool(test_string);
@@ -44,4 +51,5 @@ int main (void) {
     test_numbers();
     test_bools();
     test_nulls();
+    test_objects();
 }
