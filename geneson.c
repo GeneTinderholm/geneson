@@ -220,13 +220,10 @@ int find_one_of_next_two_characters(char* string, char a, char b) {
 int find_first_char(char* string) {
     int i = 0;
     while (string[i] != '\0') {
-        if (isspace(string[i])) {
-            ++i;
-            continue;
-        }
-        else {
+        if (!isspace(string[i])) {
             return i;
         }
+        ++i;
     }
     return -1;
 }
