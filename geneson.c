@@ -321,6 +321,7 @@ GeneSON* handle_object(char* string, int ending_index) {
     int number_of_kv_pairs = 0,
         i = 0;
 
+    // TODO add positions of commas to queues to prevent reparsing on the second pass
     while (i < ending_index) {
         ++i;
         int offset = find_first_char(&string[i]);
