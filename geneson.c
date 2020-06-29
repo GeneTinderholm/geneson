@@ -15,6 +15,9 @@ int find_first_char(char* string);
 int find_next_quote_position(char* string);
 int validate_json(char* string);
 int find_next_delimiter(char* string);
+int find_next_character(char* string, char c);
+int find_one_of_next_two_characters(char* string, char a, char b);
+int find_next_comma_or_ending_curly(char* string);
 char get_complementary_delimiter(char c);
 bool is_open_delimiter(char c);
 bool is_close_delimiter(char c);
@@ -177,8 +180,35 @@ bool str_cmp_no_null(char* string, char* sub_string) {
 }
 
 int find_next_quote_position(char* string) {
+    /* int i = 0; */
+    /* while (string[i] != '"') { */
+    /*     if (string[i] == '\0') { */
+    /*         return -1; */
+    /*     } */
+    /*     ++i; */
+    /* } */
+    /* return i; */
+    return find_next_character(string, '"');
+}
+
+int find_next_character(char* string, char c) {
     int i = 0;
-    while (string[i] != '"') {
+    while (string[i] != c) {
+        if (string[i] == '\0') {
+            return -1;
+        }
+        ++i;
+    }
+    return i;
+}
+
+int find_next_comma_or_ending_curly(char* string) {
+    return find_one_of_next_two_characters(string, ',', '}');
+}
+
+int find_one_of_next_two_characters(char* string, char a, char b) {
+    int i = 0;
+    while (string[i] != a && string[i] != b) {
         if (string[i] == '\0') {
             return -1;
         }
@@ -190,11 +220,13 @@ int find_next_quote_position(char* string) {
 int find_first_char(char* string) {
     int i = 0;
     while (string[i] != '\0') {
-        if (isspace(string[i]))
+        if (isspace(string[i])) {
+            ++i;
             continue;
-        else
+        }
+        else {
             return i;
-        ++i;
+        }
     }
     return -1;
 }
@@ -317,11 +349,38 @@ GeneSON* handle_object(char* string, int ending_index) {
         i += offset;
 
         // find colon
+        offset = find_next_character(&string[i], ':');
+        if (offset == -1) {
+            return NULL;
+        }
+        // we want the character after the colon
+        i += offset + 1;
         // find first char
+        offset = find_first_char(&string[i]);
+
+        i += offset;
         // handle each possible case
-        // find comma if exists
-        // increment i and number_of_kv_pairs
+        offset = 0;
+
+        // object or array
+        if (string[i] == '{' || string[i] == '[') {
+            offset = validate_json(&string[i]);
+        }
+        offset += find_next_comma_or_ending_curly(&string[i + offset]);
+
+        if (offset == -1) {
+            return NULL;
+        }
+        i += offset;
+
+        ++number_of_kv_pairs;
+
+        // we're done
+        if (string[i] == '}') {
+            break;
+        }
     }
+    printf("Num KV Pairs: %d\n", number_of_kv_pairs);
 
     return NULL; // TODO change
 }
