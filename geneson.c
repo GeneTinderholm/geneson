@@ -269,6 +269,8 @@ struct Node* push(struct Node* node, struct Node* next) {
     return next;
 }
 
+// stack pop from same end you push to
+// queue pop from reverse end you push to
 struct Node* pop(struct Node* node) {
     struct Node* next = node->next;
     free(node);
