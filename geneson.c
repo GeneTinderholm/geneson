@@ -408,6 +408,7 @@ GeneSON* handle_object(char* string, int ending_index) {
     for (int i = 0; i < number_of_kv_pairs; ++i) {
         printf("%d\n", head->position);
         head = queue_pop(head);
+        // TODO parse key and call parse_json on the value (character after the colon)
     }
 
     return NULL; // TODO change
