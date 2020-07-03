@@ -6,9 +6,9 @@
 
 #include "geneson.h"
 
-struct Node {
+struct StackNode {
     char delimiter;
-    struct Node* next;
+    struct StackNode* next;
 };
 
 int find_first_char(char* string);
@@ -27,8 +27,8 @@ bool is_null(char* string);
 bool is_string(char* string);
 bool is_valid_number_char(char c);
 bool str_cmp_no_null(char* string, char* sub_string);
-struct Node* push(struct Node* node, struct Node* next);
-struct Node* pop(struct Node* node);
+struct StackNode* push(struct StackNode* node, struct StackNode* next);
+struct StackNode* pop(struct StackNode* node);
 GeneSON* handle_primative(char* string);
 GeneSON* handle_bool(char* string);
 GeneSON* handle_number(char* string);
@@ -264,22 +264,22 @@ char get_complementary_delimiter(char c) {
     }
 }
 
-struct Node* push(struct Node* node, struct Node* next) {
+struct StackNode* push(struct StackNode* node, struct StackNode* next) {
     next->next = node;
     return next;
 }
 
 // stack pop from same end you push to
 // queue pop from reverse end you push to
-struct Node* pop(struct Node* node) {
-    struct Node* next = node->next;
+struct StackNode* pop(struct StackNode* node) {
+    struct StackNode* next = node->next;
     free(node);
 
     return next;
 }
 
 int validate_json(char* string) {
-    struct Node* stack = malloc(sizeof(struct Node));
+    struct StackNode* stack = malloc(sizeof(struct StackNode));
     stack->next = NULL;
     stack->delimiter = *string;
     int i = 0;
@@ -295,7 +295,7 @@ int validate_json(char* string) {
         i += offset;
 
         if (is_open_delimiter(string[i])) {
-            struct Node* node = malloc(sizeof(struct Node));
+            struct StackNode* node = malloc(sizeof(struct StackNode));
             node->delimiter = string[i];
             stack = push(stack, node);
         } else if (is_close_delimiter(string[i])) {
