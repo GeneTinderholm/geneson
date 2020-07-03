@@ -27,8 +27,8 @@ bool is_null(char* string);
 bool is_string(char* string);
 bool is_valid_number_char(char c);
 bool str_cmp_no_null(char* string, char* sub_string);
-struct StackNode* push(struct StackNode* node, struct StackNode* next);
-struct StackNode* pop(struct StackNode* node);
+struct StackNode* stack_push(struct StackNode* node, struct StackNode* next);
+struct StackNode* stack_pop(struct StackNode* node);
 GeneSON* handle_primative(char* string);
 GeneSON* handle_bool(char* string);
 GeneSON* handle_number(char* string);
@@ -264,14 +264,12 @@ char get_complementary_delimiter(char c) {
     }
 }
 
-struct StackNode* push(struct StackNode* node, struct StackNode* next) {
+struct StackNode* stack_push(struct StackNode* node, struct StackNode* next) {
     next->next = node;
     return next;
 }
 
-// stack pop from same end you push to
-// queue pop from reverse end you push to
-struct StackNode* pop(struct StackNode* node) {
+struct StackNode* stack_pop(struct StackNode* node) {
     struct StackNode* next = node->next;
     free(node);
 
@@ -297,12 +295,12 @@ int validate_json(char* string) {
         if (is_open_delimiter(string[i])) {
             struct StackNode* node = malloc(sizeof(struct StackNode));
             node->delimiter = string[i];
-            stack = push(stack, node);
+            stack = stack_push(stack, node);
         } else if (is_close_delimiter(string[i])) {
             if (stack->delimiter != get_complementary_delimiter(string[i])) {
                 return -1;
             }
-            stack = pop(stack);
+            stack = stack_pop(stack);
         } else {
             // string[i] is "
             ++i;
