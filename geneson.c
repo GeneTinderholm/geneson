@@ -11,6 +11,11 @@ struct StackNode {
     struct StackNode* next;
 };
 
+struct QueueNode {
+    int position;
+    struct QueueNode* next;
+};
+
 int find_first_char(char* string);
 int find_next_quote_position(char* string);
 int validate_json(char* string);
@@ -29,6 +34,8 @@ bool is_valid_number_char(char c);
 bool str_cmp_no_null(char* string, char* sub_string);
 struct StackNode* stack_push(struct StackNode* head, struct StackNode* next);
 struct StackNode* stack_pop(struct StackNode* head);
+struct QueueNode* queue_push(struct QueueNode* tail, struct QueueNode* next);
+struct QueueNode* queue_pop(struct QueueNode* head);
 GeneSON* handle_primative(char* string);
 GeneSON* handle_bool(char* string);
 GeneSON* handle_number(char* string);
@@ -271,6 +278,15 @@ struct StackNode* stack_push(struct StackNode* head, struct StackNode* next) {
 
 struct StackNode* stack_pop(struct StackNode* head) {
     struct StackNode* next_head = head->next;
+    free(head);
+    return next_head;
+}
+struct QueueNode* queue_push(struct QueueNode* tail, struct QueueNode* next) {
+    tail->next = next;
+    return next;
+}
+struct QueueNode* queue_pop(struct QueueNode* head) {
+    struct QueueNode* next_head = head->next;
     free(head);
     return next_head;
 }
