@@ -27,8 +27,8 @@ bool is_null(char* string);
 bool is_string(char* string);
 bool is_valid_number_char(char c);
 bool str_cmp_no_null(char* string, char* sub_string);
-struct StackNode* stack_push(struct StackNode* node, struct StackNode* next);
-struct StackNode* stack_pop(struct StackNode* node);
+struct StackNode* stack_push(struct StackNode* head, struct StackNode* next);
+struct StackNode* stack_pop(struct StackNode* head);
 GeneSON* handle_primative(char* string);
 GeneSON* handle_bool(char* string);
 GeneSON* handle_number(char* string);
@@ -264,16 +264,15 @@ char get_complementary_delimiter(char c) {
     }
 }
 
-struct StackNode* stack_push(struct StackNode* node, struct StackNode* next) {
-    next->next = node;
+struct StackNode* stack_push(struct StackNode* head, struct StackNode* next) {
+    next->next = head;
     return next;
 }
 
-struct StackNode* stack_pop(struct StackNode* node) {
-    struct StackNode* next = node->next;
-    free(node);
-
-    return next;
+struct StackNode* stack_pop(struct StackNode* head) {
+    struct StackNode* next_head = head->next;
+    free(head);
+    return next_head;
 }
 
 int validate_json(char* string) {
