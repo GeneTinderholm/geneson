@@ -359,7 +359,6 @@ GeneSON* handle_object(char* string, int ending_index) {
         i = 0,
         offset = 0;
 
-    // TODO add positions of commas to queues to prevent reparsing on the second pass
     struct QueueNode* head = malloc(sizeof(struct QueueNode));
     struct QueueNode* tail = head;
 
@@ -432,9 +431,6 @@ GeneSON* handle_object(char* string, int ending_index) {
     result->type = GeneSONObject;
     result->value.v = kv_pair_holder;
 
-    printf("Num KV Pairs: %d\n", number_of_kv_pairs);
-    // How to store length of kv pairs?
-    // TODO handle case with no kv pairs
     if (number_of_kv_pairs == 0) {
         // this is kind of wasteful would handling objects as a linked list of kv pair arrays be a better option? Bring in a map library?
         free(head);
@@ -446,7 +442,6 @@ GeneSON* handle_object(char* string, int ending_index) {
 
     offset = 0;
     for (int i = 0; i < number_of_kv_pairs; ++i) {
-        // TODO parse key and call parse_json on the value (character after the colon)
         offset += find_next_quote_position(&string[offset]);
         ++offset;
 
@@ -461,7 +456,6 @@ GeneSON* handle_object(char* string, int ending_index) {
             key[j] = string[offset + j];
             key[key_length] = '\0';
         }
-        printf("key: %s\n", key);
         kv_pair_array[i].key = key;
 
         offset = end_of_key + 1;

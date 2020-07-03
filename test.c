@@ -6,9 +6,13 @@
 #include "geneson.h"
 
 void assert(bool test, char* message) {
+    char* prefix;
     if(!test) {
-        fprintf(stderr, "%s\n", message);
+        prefix = "FAILED %s\n";
+    } else {
+        prefix = "PASSED %s\n";
     }
+    fprintf(stderr, prefix, message);
 }
 
 void test_strings() {
@@ -25,12 +29,25 @@ void test_numbers() {
 
 void test_objects() {
     GeneSON* test_obj = parse_json("{\"a\":\"b\"}");
-    GeneSON* test_obj2 = parse_json("{\"a\":[1, 2, 3]}");
-    GeneSON* test_obj3 = parse_json("{\"a\":\"b\", \"c\": \"d\"}");
-    GeneSON* test_obj4 = parse_json("{\"a\":{\"b\":\"c\"}}");
-    GeneSON* value = geneson_get_object_key(test_obj3, "c");
+    GeneSON* value = geneson_get_object_key(test_obj, "a");
     char* string = geneson_get_string(value);
-    printf("Result is: %s\n", string);
+    assert(strcmp(string, "b") == 0, "Should be able to grab key from object 1");
+
+    // TODO arrays
+    GeneSON* test_obj2 = parse_json("{\"a\":[1, 2, 3]}");
+
+    GeneSON* test_obj3 = parse_json("{\"a\":\"b\", \"c\": \"d\"}");
+    GeneSON* value3 = geneson_get_object_key(test_obj, "a");
+    char* string_a = geneson_get_string(value3);
+    assert(strcmp(string_a, "b") == 0, "Should be able to grab key a from object 2");
+    char* string_c = geneson_get_string(geneson_get_object_key(test_obj3, "c"));
+    assert(strcmp(string_c, "d") == 0, "Should be able to grab key c from object 2");
+
+    GeneSON* test_obj4 = parse_json("{\"a\":{\"b\":\"c\"}}");
+    GeneSON* value4 = geneson_get_object_key(geneson_get_object_key(test_obj4, "a"), "b");
+    char* string_4 = geneson_get_string(value4);
+    assert(strcmp(string_4, "c") == 0, "Should be able to grab key from nested object");
+
 }
 
 void test_bools() {
@@ -50,9 +67,11 @@ void test_nulls() {
 }
 
 int main (void) {
+    puts("Start Tests");
     test_strings();
     test_numbers();
     test_bools();
     test_nulls();
     test_objects();
+    puts("End Tests");
 }
