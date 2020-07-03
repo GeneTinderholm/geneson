@@ -24,10 +24,13 @@ void test_numbers() {
 }
 
 void test_objects() {
-    GeneSON* test_string = parse_json("{\"a\":\"b\"}");
-    GeneSON* test_string2 = parse_json("{\"a\":[1, 2, 3]}");
-    GeneSON* test_string3 = parse_json("{\"a\":\"b\", \"c\": \"d\"}");
-    GeneSON* test_string4 = parse_json("{\"a\":{\"b\":\"c\"}}");
+    GeneSON* test_obj = parse_json("{\"a\":\"b\"}");
+    GeneSON* test_obj2 = parse_json("{\"a\":[1, 2, 3]}");
+    GeneSON* test_obj3 = parse_json("{\"a\":\"b\", \"c\": \"d\"}");
+    GeneSON* test_obj4 = parse_json("{\"a\":{\"b\":\"c\"}}");
+    GeneSON* value = geneson_get_object_key(test_obj3, "c");
+    char* string = geneson_get_string(value);
+    printf("Result is: %s\n", string);
 }
 
 void test_bools() {

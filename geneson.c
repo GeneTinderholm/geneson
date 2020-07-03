@@ -21,6 +21,11 @@ struct KeyValuePair {
     GeneSON* value;
 };
 
+struct GenericArray {
+    int length;
+    void* elements;
+};
+
 int find_first_char(char* string);
 int find_next_quote_position(char* string);
 int validate_json(char* string);
@@ -89,6 +94,19 @@ bool geneson_get_bool(GeneSON* json) {
 }
 void* geneson_get_null(GeneSON* json) {
     return json->value.v;
+}
+
+GeneSON* geneson_get_object_key(GeneSON* json, char* key) {
+    struct GenericArray* kv_pair_holder = json->value.v;
+
+    for (int i = 0; i < kv_pair_holder->length; ++i) {
+        struct KeyValuePair* pairs = (struct KeyValuePair*) kv_pair_holder->elements;
+        if (strcmp(key, pairs[i].key) == 0) {
+            return pairs[i].value;
+        }
+    }
+
+    return NULL;
 }
 
 GeneSON* handle_primative(char* string) {
@@ -338,7 +356,8 @@ int validate_json(char* string) {
 
 GeneSON* handle_object(char* string, int ending_index) {
     int number_of_kv_pairs = 0,
-        i = 0;
+        i = 0,
+        offset = 0;
 
     // TODO add positions of commas to queues to prevent reparsing on the second pass
     struct QueueNode* head = malloc(sizeof(struct QueueNode));
@@ -346,7 +365,7 @@ GeneSON* handle_object(char* string, int ending_index) {
 
     while (i < ending_index) {
         ++i;
-        int offset = find_first_char(&string[i]);
+        offset = find_first_char(&string[i]);
         i += offset;
 
         if (string[i] == '}') {
@@ -403,13 +422,59 @@ GeneSON* handle_object(char* string, int ending_index) {
         }
         tail = queue_push(tail, malloc(sizeof(struct QueueNode)));
     }
-    printf("Num KV Pairs: %d\n", number_of_kv_pairs);
 
-    for (int i = 0; i < number_of_kv_pairs; ++i) {
-        printf("%d\n", head->position);
-        head = queue_pop(head);
-        // TODO parse key and call parse_json on the value (character after the colon)
+    struct GenericArray* kv_pair_holder = malloc(sizeof(struct GenericArray));
+    kv_pair_holder->length = number_of_kv_pairs;
+
+    GeneSON* result = malloc(sizeof(GeneSON));
+    union GeneSONValue value;
+    result->value = value;
+    result->type = GeneSONObject;
+    result->value.v = kv_pair_holder;
+
+    printf("Num KV Pairs: %d\n", number_of_kv_pairs);
+    // How to store length of kv pairs?
+    // TODO handle case with no kv pairs
+    if (number_of_kv_pairs == 0) {
+        // this is kind of wasteful would handling objects as a linked list of kv pair arrays be a better option? Bring in a map library?
+        free(head);
+        return result;
     }
 
-    return NULL; // TODO change
+    struct KeyValuePair* kv_pair_array = malloc(sizeof(struct KeyValuePair) * number_of_kv_pairs);
+    kv_pair_holder->elements = kv_pair_array;
+
+    offset = 0;
+    for (int i = 0; i < number_of_kv_pairs; ++i) {
+        // TODO parse key and call parse_json on the value (character after the colon)
+        offset += find_next_quote_position(&string[offset]);
+        ++offset;
+
+        // the +1s are to correct for the two off by one errors we get by keeping offset equal to the position of the first quote
+        // that position is useful later
+        int key_length = find_next_quote_position(&string[offset]);
+        int end_of_key = key_length + offset;
+        char* key = malloc(sizeof(char) * (key_length + 1));
+
+        // parse out key
+        for (int j = 0; j < (key_length); ++j) {
+            key[j] = string[offset + j];
+            key[key_length] = '\0';
+        }
+        printf("key: %s\n", key);
+        kv_pair_array[i].key = key;
+
+        offset = end_of_key + 1;
+        offset += find_next_character(&string[offset], ':');
+        // start after colon
+        ++offset;
+
+        GeneSON* value = parse_json(&string[offset]);
+        kv_pair_array[i].value = value;
+
+        offset = head->position + 1;
+        head = queue_pop(head);
+    }
+
+    return result;
 }

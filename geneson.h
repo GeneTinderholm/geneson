@@ -26,5 +26,6 @@ char* geneson_get_string(GeneSON* json);
 float geneson_get_number(GeneSON* json);
 bool geneson_get_bool(GeneSON* json);
 void* geneson_get_null(GeneSON* json);
+GeneSON* geneson_get_object_key(GeneSON* json, char* key);
 
 #endif
