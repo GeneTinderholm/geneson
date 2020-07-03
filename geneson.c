@@ -16,6 +16,11 @@ struct QueueNode {
     struct QueueNode* next;
 };
 
+struct KeyValuePair {
+    char* key;
+    GeneSON* value;
+};
+
 int find_first_char(char* string);
 int find_next_quote_position(char* string);
 int validate_json(char* string);
@@ -336,6 +341,9 @@ GeneSON* handle_object(char* string, int ending_index) {
         i = 0;
 
     // TODO add positions of commas to queues to prevent reparsing on the second pass
+    struct QueueNode* head = malloc(sizeof(struct QueueNode));
+    struct QueueNode* tail = head;
+
     while (i < ending_index) {
         ++i;
         int offset = find_first_char(&string[i]);
@@ -376,7 +384,7 @@ GeneSON* handle_object(char* string, int ending_index) {
 
         // object or array
         if (string[i] == '{' || string[i] == '[') {
-            offset = validate_json(&string[i]);
+            offset = validate_json(&string[i]) + 1; // need to start looking after the end of the nested object
         }
         offset += find_next_comma_or_ending_curly(&string[i + offset]);
 
@@ -387,12 +395,20 @@ GeneSON* handle_object(char* string, int ending_index) {
 
         ++number_of_kv_pairs;
 
+        tail->position = i;
+
         // we're done
         if (string[i] == '}') {
             break;
         }
+        tail = queue_push(tail, malloc(sizeof(struct QueueNode)));
     }
     printf("Num KV Pairs: %d\n", number_of_kv_pairs);
+
+    for (int i = 0; i < number_of_kv_pairs; ++i) {
+        printf("%d\n", head->position);
+        head = queue_pop(head);
+    }
 
     return NULL; // TODO change
 }
