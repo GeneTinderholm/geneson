@@ -70,6 +70,10 @@ GeneSON* parse_json(char* json_string) {
         return handle_object(&json_string[i], ending_index);
     }
 
+    if (json_string[i] == '[') {
+        return handle_array(&json_string[i], ending_index);
+    }
+
     /* while (json_string[i] != '\0') { */
     /*     if (isspace(json_string[i])) { */
     /*         continue; */
@@ -471,4 +475,33 @@ GeneSON* handle_object(char* string, int ending_index) {
     }
 
     return result;
+}
+
+GeneSON* handle_array(char* string, int ending_index) {
+    // don't want to look at the begining [
+    ++string;
+
+    int i = 0;
+
+    if (string[i] == ']') {
+        // handle empty array
+    }
+
+    int number_of_elements = 0,
+        offset;
+
+    while (i < ending_index) {
+        i += find_first_char(string);
+        if (string[i] == ']') {
+            break;
+        }
+        offset = validate_json(&string[i]);
+        i += offset;
+        ++number_of_elements;
+        i += find_one_of_next_two_characters(&string[i], ',', ']');
+    }
+
+    printf("ELEMENTS: %d", number_of_elements);
+
+    return NULL;
 }
