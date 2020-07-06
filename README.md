@@ -22,3 +22,6 @@ We probably don't, but I'm learning C, and it seemed like a reasonable project t
 - [ ] parse number of array elements
 - [ ] parse array element
 
+# Next steps
+
+Use linked list for object/arrays, it's going to be a lot easier once we start mutating things, also I believe it will let me parse this in one pass rather than the two I'm currently doing.
