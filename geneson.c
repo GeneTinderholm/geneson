@@ -34,6 +34,7 @@ int find_next_character(char* string, char c);
 int find_one_of_next_two_characters(char* string, char a, char b);
 int find_next_comma_or_ending_curly(char* string);
 char get_complementary_delimiter(char c);
+char* substring(char* donor, int beginning, int end);
 bool is_open_delimiter(char c);
 bool is_close_delimiter(char c);
 bool is_bool(char* string);
@@ -296,6 +297,18 @@ char get_complementary_delimiter(char c) {
         default:
             return -1;
     }
+}
+
+// end is inclusive
+char* substring(char* donor, int beginning, int end) {
+    int length = (end + 1) - beginning;
+    char* result = malloc(sizeof(char) * length + 1); // remember null
+
+    for (int i = 0; i < length; ++i) {
+        result[i] = donor[beginning + i];
+    }
+    result[length] = '\0';
+    return result;
 }
 
 struct StackNode* stack_push(struct StackNode* head, struct StackNode* next) {
