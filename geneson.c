@@ -496,25 +496,51 @@ GeneSON* handle_array(char* string, int ending_index) {
 
     int i = 0;
 
-    if (string[i] == ']') {
-        // handle empty array
-    }
-
     int number_of_elements = 0,
         offset;
+    struct QueueNode* head = malloc(sizeof(struct QueueNode));
+    struct QueueNode* tail = head;
 
     while (i < ending_index) {
         i += find_first_char(string);
+        // this shouldn't need to be here twice. Should this be a do while loop?
         if (string[i] == ']') {
             break;
         }
         offset = validate_json(&string[i]);
         i += offset;
         ++number_of_elements;
-        i += find_one_of_next_two_characters(&string[i], ',', ']');
+        offset = find_one_of_next_two_characters(&string[i], ',', ']');
+
+        if (offset == -1) {
+            return NULL;
+        }
+        i += offset;
+
+        tail->position = i;
+
+        if (string[i] == ']') {
+            break;
+        }
+
+        tail = queue_push(tail, malloc(sizeof(struct QueueNode)));
     }
 
-    printf("ELEMENTS: %d", number_of_elements);
+    struct GenericArray* el_holder = malloc(sizeof(struct GenericArray));
+    el_holder->length = number_of_elements;
+    GeneSON* result = malloc(sizeof(GeneSON));
+    result->type = GeneSONArray;
+    result->value.v = el_holder;
+
+    if (number_of_elements == 0) {
+        free(head);
+        el_holder->elements = NULL;
+        return result;
+    }
+
+    for (int i = 0; i < number_of_elements; ++i) {
+        // call parse json at each element and free the head
+    }
 
     return NULL;
 }
