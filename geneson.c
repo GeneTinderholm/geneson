@@ -507,7 +507,16 @@ GeneSON* handle_array(char* string, int ending_index) {
         if (string[i] == ']') {
             break;
         }
-        offset = validate_json(&string[i]);
+        offset = 0;
+        if (string[i] == '{' || string[i] == '[') {
+            offset = validate_json(&string[i]);
+        } else {
+            offset = find_next_character(&string[i], ',') - 1;
+        }
+
+        if (offset == -1) {
+            return NULL;
+        }
         i += offset;
         ++number_of_elements;
         offset = find_one_of_next_two_characters(&string[i], ',', ']');
@@ -538,9 +547,15 @@ GeneSON* handle_array(char* string, int ending_index) {
         return result;
     }
 
+    GeneSON** geneson_arr = malloc(sizeof(GeneSON*) * number_of_elements);
+    i = 0;
     for (int i = 0; i < number_of_elements; ++i) {
         // call parse json at each element and free the head
+        geneson_arr[i] = parse_json(&string[i]);
+        head = queue_pop(head);
     }
 
-    return NULL;
+    el_holder->elements = geneson_arr;
+
+    return result;
 }
